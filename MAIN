@@ -1,1 +1,90 @@
+package JobRecruitmentSystem;
 
+import java.util.PriorityQueue;
+
+class Patient implements {
+    private String name;
+    private int priority; // 1 = Critical, 2 = Serious, 3 = Stable, 4 = Minor
+    private String condition;
+    private String arrivalTime;
+
+    public Patient(String name, int priority, String condition, String arrivalTime) {
+        this.name = name;
+        this.priority = priority;
+        this.condition = condition;
+        this.arrivalTime = arrivalTime;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public String getArrivalTime() {
+        return arrivalTime;
+    }
+
+    @Override
+    public int compareTo(Patient other) {
+        // Order by priority first (lower number = higher priority)
+        if (this.priority != other.priority) {
+            return Integer.compare(this.priority, other.priority);
+        }
+        // If same priority, earlier arrival time first
+        return this.arrivalTime.compareTo(other.arrivalTime);
+    }
+
+    @Override
+    public String toString() {
+        return "[P" + priority + "] " + name + " - " + condition + " (" + arrivalTime + ")";
+    }
+}
+
+class ERQueue {
+    private PriorityQueue<Patient> queue;
+
+    public ERQueue() {
+        queue = new PriorityQueue<>();
+    }
+
+    public void arrive(String name, int priority, String condition, String time) {
+        Patient p = new Patient(name, priority, condition, time);
+        queue.add(p);
+    }
+
+    public void treatNext() {
+        if (queue.isEmpty()) {
+            System.out.println(">>> No patients to treat.");
+            return;
+        }
+        System.out.println("\n>>> Treating patient now...");
+        Patient treated = queue.poll();
+        System.out.println("Treated: " + treated);
+    }
+
+    public void displayQueue() {
+        System.out.println("\n=== UPDATED QUEUE ===");
+        System.out.println("Patients Waiting: " + queue.size());
+
+        int i = 1;
+        for (Patient p : queue.stream().sorted().toList()) {
+            System.out.println(i + ". " + p);
+            i++;
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        ERQueue er = new ERQueue();
+
+        er.arrive("Pedro Cruz", 1, "Head injury - NOW UNCONSCIOUS ⚠️", "23:52");
+        er.arrive("Carlos Mendoza", 2, "Compound fracture - leg", "23:50");
+        er.arrive("Lisa Wang", 2, "Severe asthma attack", "23:56");
+        er.arrive("Maria Santos", 3, "Deep laceration on arm", "23:48");
+        er.arrive("Ana Lim", 4, "Sprained ankle", "23:49");
+
+        er.displayQueue();
+        er.treatNext();
+        er.displayQueue();
+    }
+}
