@@ -1,90 +1,88 @@
 package JobRecruitmentSystem;
 
 import java.util.PriorityQueue;
+import java.util.Scanner;
 
-class Patient implements {
-    private String name;
-    private int priority; // 1 = Critical, 2 = Serious, 3 = Stable, 4 = Minor
-    private String condition;
-    private String arrivalTime;
+class Patient implements Comparable<Patient> {
+    String name, condition, time;
+    int priority;
 
-    public Patient(String name, int priority, String condition, String arrivalTime) {
-        this.name = name;
-        this.priority = priority;
-        this.condition = condition;
-        this.arrivalTime = arrivalTime;
+    Patient(String n, int p, String c, String t) {
+        name = n; priority = p; condition = c; time = t;
     }
 
-    public int getPriority() {
-        return priority;
-    }
-
-    public String getArrivalTime() {
-        return arrivalTime;
-    }
-
-    @Override
     public int compareTo(Patient other) {
-        // Order by priority first (lower number = higher priority)
-        if (this.priority != other.priority) {
-            return Integer.compare(this.priority, other.priority);
-        }
-        // If same priority, earlier arrival time first
-        return this.arrivalTime.compareTo(other.arrivalTime);
+        if (priority != other.priority) return priority - other.priority;
+        return time.compareTo(other.time); // earlier time first
     }
 
-    @Override
     public String toString() {
-        return "[P" + priority + "] " + name + " - " + condition + " (" + arrivalTime + ")";
-    }
-}
-
-class ERQueue {
-    private PriorityQueue<Patient> queue;
-
-    public ERQueue() {
-        queue = new PriorityQueue<>();
-    }
-
-    public void arrive(String name, int priority, String condition, String time) {
-        Patient p = new Patient(name, priority, condition, time);
-        queue.add(p);
-    }
-
-    public void treatNext() {
-        if (queue.isEmpty()) {
-            System.out.println(">>> No patients to treat.");
-            return;
-        }
-        System.out.println("\n>>> Treating patient now...");
-        Patient treated = queue.poll();
-        System.out.println("Treated: " + treated);
-    }
-
-    public void displayQueue() {
-        System.out.println("\n=== UPDATED QUEUE ===");
-        System.out.println("Patients Waiting: " + queue.size());
-
-        int i = 1;
-        for (Patient p : queue.stream().sorted().toList()) {
-            System.out.println(i + ". " + p);
-            i++;
-        }
+        return "[P" + priority + "] " + name + " - " + condition + " (" + time + ")";
     }
 }
 
 public class Main {
     public static void main(String[] args) {
-        ERQueue er = new ERQueue();
+        Scanner sc = new Scanner(System.in);
+        PriorityQueue<Patient> er = new PriorityQueue<>();
+        int choice;
 
-        er.arrive("Pedro Cruz", 1, "Head injury - NOW UNCONSCIOUS ⚠️", "23:52");
-        er.arrive("Carlos Mendoza", 2, "Compound fracture - leg", "23:50");
-        er.arrive("Lisa Wang", 2, "Severe asthma attack", "23:56");
-        er.arrive("Maria Santos", 3, "Deep laceration on arm", "23:48");
-        er.arrive("Ana Lim", 4, "Sprained ankle", "23:49");
+        do {
+            System.out.println("\n--- EMERGENCY ROOM SYSTEM ---");
+            System.out.println("1. Add Patient");
+            System.out.println("2. Treat Next Patient");
+            System.out.println("3. Display Queue");
+            System.out.println("0. Exit");
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+            sc.nextLine(); // consume newline
 
-        er.displayQueue();
-        er.treatNext();
-        er.displayQueue();
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter name: ");
+                    String name = sc.nextLine();
+                    System.out.print("Enter priority (1=Critical, 2=Serious, 3=Stable, 4=Minor): ");
+                    int priority = sc.nextInt();
+                    sc.nextLine();
+                    System.out.print("Enter condition: ");
+                    String condition = sc.nextLine();
+                    System.out.print("Enter arrival time (HH:MM): ");
+                    String time = sc.nextLine();
+                    er.add(new Patient(name, priority, condition, time));
+                    System.out.println("Patient added.");
+                    break;
+
+                case 2:
+                    if (er.isEmpty()) {
+                        System.out.println(">>> No patients to treat.");
+                    } else {
+                        System.out.println("\n>>> Treating patient now...");
+                        System.out.println("Treated: " + er.poll());
+                    }
+                    break;
+
+                case 3:
+                    System.out.println("\n=== UPDATED QUEUE ===");
+                    if (er.isEmpty()) {
+                        System.out.println("No patients waiting.");
+                    } else {
+                        int i = 1;
+                        for (Patient p : er.stream().sorted().toList()) {
+                            System.out.println(i + ". " + p);
+                            i++;
+                        }
+                    }
+                    break;
+
+                case 0:
+                    System.out.println("Exiting...");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice.");
+            }
+        } while (choice != 0);
+
+        sc.close();
     }
 }
