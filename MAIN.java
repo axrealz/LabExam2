@@ -1,4 +1,4 @@
-package JobRecruitmentSystem;
+package LabExam;
 
 import java.util.PriorityQueue;
 import java.util.Scanner;
@@ -21,7 +21,7 @@ class Patient implements Comparable<Patient> {
     }
 }
 
-public class Main {
+public class LabExam2 {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         PriorityQueue<Patient> er = new PriorityQueue<>();
